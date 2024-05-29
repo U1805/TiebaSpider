@@ -50,10 +50,10 @@ class FileSelector(QWidget):
         label = QLabel('<font color="red">不要开 VPN！</font>', self)
         layout.addWidget(label)
 
-        # 文本输入框 - tid
-        self.tid_input = QLineEdit(self)
-        self.tid_input.setPlaceholderText("输入tid")
-        layout.addWidget(self.tid_input)
+        # 文本输入框 - url
+        self.url_input = QLineEdit(self)
+        self.url_input.setPlaceholderText("输入url")
+        layout.addWidget(self.url_input)
 
         # 文本输入框 - cookie
         self.cookie_input = QLineEdit(self)
@@ -89,7 +89,7 @@ class FileSelector(QWidget):
     def start_thread(self):
         if not self.my_thread or not self.my_thread.isRunning():
             self.my_thread = Worker(
-                self.tid_input.text(),
+                self.url_input.text().split("?")[0].split("/")[-1],
                 self.cookie_input.text(),
                 self.checkbox_localize.isChecked(),
                 self.thread_input.value(),
@@ -97,9 +97,6 @@ class FileSelector(QWidget):
             self.my_thread.updateProgressBar.connect(self.updateProgressBar)
             self.my_thread.updateButtonText.connect(self.updateButtonText)
             self.my_thread.start()
-            # self.btn_start.setText("Downloading...")
-            # self.my_thread.join()
-            # self.btn_start.setText("🚀Start!")
 
     def updateProgressBar(self, cnt):
         self.progress_bar.setValue(cnt)
