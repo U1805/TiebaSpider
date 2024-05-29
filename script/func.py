@@ -218,7 +218,7 @@ def run(tid, cookie1, local, max_connections, progress_callback):
     print("downloading replies...")
     fetchReply(tid)
 
-    with open("template.html", 'r', encoding="utf-8") as f:
+    with open("script/template.html", 'r', encoding="utf-8") as f:
         template_page = f.read()
 
     template_page = template_page.replace("%html_title%", html_title)
