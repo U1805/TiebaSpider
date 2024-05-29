@@ -16,6 +16,7 @@ import func
 
 class Worker(QThread):
     updateProgressBar = pyqtSignal(int)
+    updateButtonText = pyqtSignal(str)
 
     def __init__(self, tid, cookie, local, max_connections):
         super().__init__()
@@ -31,6 +32,7 @@ class Worker(QThread):
             self.local,
             self.max_connections,
             self.updateProgressBar.emit,
+            self.updateButtonText.emit,
         )
 
 
@@ -93,6 +95,7 @@ class FileSelector(QWidget):
                 self.thread_input.value(),
             )
             self.my_thread.updateProgressBar.connect(self.updateProgressBar)
+            self.my_thread.updateButtonText.connect(self.updateButtonText)
             self.my_thread.start()
             # self.btn_start.setText("Downloading...")
             # self.my_thread.join()
@@ -100,6 +103,9 @@ class FileSelector(QWidget):
 
     def updateProgressBar(self, cnt):
         self.progress_bar.setValue(cnt)
+
+    def updateButtonText(self, msg):
+        self.btn_start.setText(msg)
 
 
 def main():

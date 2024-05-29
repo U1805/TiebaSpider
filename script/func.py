@@ -11,7 +11,8 @@ import threading
 from requests.adapters import HTTPAdapter
 
 
-comment_pool = []
+COMMENT_POOL = []
+COOKIE = ""
 
 TEMPLATE = {
     "louzhubiaoshi": """<div class=louzhubiaoshi_wrap><div class="louzhubiaoshi beMember_fl j_louzhubiaoshi"></div></div>""",
@@ -21,24 +22,19 @@ TEMPLATE = {
     "reply_part2": """</ul> </div> </div> """,
 }
 
-cookie = ""
-
 
 def myrequests(url):
-    global cookie
+    global COOKIE
 
     header = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-        "Cookie": cookie,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Cookie": COOKIE,
     }
 
-    try:
-        s = requests.Session()
-        s.mount("http://", HTTPAdapter(max_retries=3))  # 超时重试3次
-        s.mount("https://", HTTPAdapter(max_retries=3))
-        res = s.get(url, timeout=(10, 27), headers=header)  # (connect超时, read超时)
-    except:
-        raise (Exception("❌ Cookie 失效"))
+    s = requests.Session()
+    s.mount("http://", HTTPAdapter(max_retries=3))  # 超时重试3次
+    s.mount("https://", HTTPAdapter(max_retries=3))
+    res = s.get(url, timeout=(10, 27), headers=header)  # (connect超时, read超时)
     return res
 
 
@@ -68,11 +64,11 @@ def img2base64(url, quality=40):
 
 
 def getComment(post_id: str) -> list:
-    if post_id not in comment_pool:
+    if post_id not in COMMENT_POOL:
         return ""
 
     res = TEMPLATE["reply_part0"]
-    post_comment = comment_pool[post_id]
+    post_comment = COMMENT_POOL[post_id]
     # comment_num = post_comment["comment_list_num"]
     for comment in post_comment["comment_info"]:
         # print(comment["username"]) #注册名字
@@ -164,7 +160,7 @@ def getContent(page, local=True) -> dict:
 
 
 def fetchPage(tid, pn=1):
-    global comment_pool
+    global COMMENT_POOL
     page_title = None
     page_num = None
 
@@ -186,7 +182,8 @@ def fetchPage(tid, pn=1):
     return main_page, page_title, page_num
 
 
-def fetchReply(tid):
+def fetchReply(tid, total, progress_callback):
+    global COMMENT_POOL
     pn = 1
     while True:
         try:
@@ -194,11 +191,13 @@ def fetchReply(tid):
                 f"https://tieba.baidu.com/p/totalComment?tid={tid}&pn={pn}&see_lz=0"
             )
             comments = json.loads(res.text)
-            comment_pool = dict(comment_pool, **comments["data"]["comment_list"])
+            COMMENT_POOL = dict(COMMENT_POOL, **comments["data"]["comment_list"])
+            progress_callback(pn / total * 100)
             pn += 1
         except:
             # 评论页数比显示页数少
             break
+    print(f"get replies {pn} pages")
 
 
 def formatPage(page, local=True):
@@ -234,34 +233,40 @@ def formatPage(page, local=True):
     return res
 
 
-def run(tid, cookie1, local, max_connections, progress_callback):
-    global cookie
+def run(tid, cookie1, local, max_connections, progress_callback, button_callback):
+    global COOKIE
 
     if tid == "" or cookie1 == "":
         return
 
-    cookie = cookie1
+    COOKIE = cookie1
 
     page, html_title, page_num = fetchPage(tid)
-    print("downloading replies...")
-    fetchReply(tid)
+    button_callback("Downloading replies...")
+    fetchReply(tid, page_num, progress_callback)
 
+    button_callback("Downloading pages...")
     with open("script/template.html", "r", encoding="utf-8") as f:
         template_page = f.read()
 
     template_page = template_page.replace("%html_title%", html_title)
-    template_page = template_page.replace("%post_title%", re.sub(r'_.+_百度贴吧$', '', html_title))
+    template_page = template_page.replace(
+        "%post_title%", re.sub(r"_.+_百度贴吧$", "", html_title)
+    )
 
     content_res = [None for _ in range(page_num)]
     content_res[0] = formatPage(page, local)
 
     # 信号量，用来限制线程数
     pool_sema = threading.BoundedSemaphore(max_connections)
+    current_done = 1
 
     def f(i):
+        nonlocal current_done
         page, _, _ = fetchPage(tid, i)
         content_res[i - 1] = formatPage(page, local)
-        progress_callback(i / page_num * 100)
+        current_done += 1
+        progress_callback(current_done / page_num * 100)
         pool_sema.release()
 
     thread_list = []
@@ -277,3 +282,14 @@ def run(tid, cookie1, local, max_connections, progress_callback):
     t = template_page.replace("%content%", "\n".join(content_res))
     with open(f"{tid} - {html_title}.html", "w", encoding="utf-8") as f:
         f.write(t)
+
+    button_callback("🚀Start!")
+
+
+# run(
+#     "8892250740",
+#     'XFI=0c84e0b0-1dac-11ef-9290-195f5c0b14c9; XFCS=5C18AA3D0F7CBB04CF07AB2E045E29E842DE3B2F0B5D1C0F24E9B903DFA00BDD; XFT=hHBK/DFjirFlN3Kzxs4ZyJ7qQ37GVMqYowTYkg+cr/o=; BAIDUID=A157A8003C389B8FFB60F697794B3274:FG=1; BAIDUID_BFESS=A157A8003C389B8FFB60F697794B3274:FG=1; wise_device=0; BAIDU_WISE_UID=wapp_1716980638876_966; USER_JUMP=-1; Hm_lvt_98b9d8c2fd6608d564bf2ac2ae642948=1716980645; ZFY=b874xSaw8FCfFNzZI7UPNLW1HgaHknudjSnsEGLIvp8:C; st_key_id=17; tb_as_data=9aa838e3a099b5cd74d4e173b5f7303dfad7aea5c35885bdd53dff47402efb884f96664e6d50efbf621ab1f6083acc2cdae610cd9cf0e9cad5b162a16fad8d912a9e2adb3e6d3bc823f83a186339b52ab38a5f679fc8880bfc2be70604ce715b538e100c86de26d0856b3435be720a66; Hm_lpvt_98b9d8c2fd6608d564bf2ac2ae642948=1716981025; BA_HECTOR=2l8k80a004840h80ag0gag057tf3va1j5e3911u; ab_sr=1.0.1_Y2JhYzIzNmI0NDcyMzJiYzI2OTA0YTUwZjhiNjNmMmYxOWE5ZWViMzU4NWYyY2MxMzAwODVmMGMyODU2MThkODhhNmZmMzQwOWQ3MTM4YTZiOGJjNmRlYmIyZTY5MTZjYTA4NjM0NjZlNmUzNzk5ZTg3YTZjNjhmN2JkOWQ1YjNmYTY4ZGUwYzEwODk3ZWJmMTFjM2NmNzVjNjM3MTcwNDgwOGVjNjkxYjY3MDg4YjgwOTNmZjMzZjM3MGY4MWQ0NmQ3Njg5MWYyYzU2YWNlODQ3YTczNzcyOWE4ZGUxMWY=; st_data=818240818db3b08d63fea0b54d5ccc59a3bb7c27ceb2e17b8235ade834d1c8be8f5c955f52270a0266c962c1d04f4fd7078f1994b92758323b0672d98fba3f4fc13cc0032e02b59ab0443a4f9a9700033185934658d8ff543f7749a58fdd153c4216e3c064a555b20235ec19ae12bd6e2deae6e338eb109f6544eb0344620b315515f3bb0d80d5b2f5fccab0f97955357d354285af3d319bcbd57bea110bcd40; st_sign=1693e512; RT="z=1&dm=baidu.com&si=04b4184f-f239-4c7c-b97b-73596d97f3f1&ss=lwrpfwce&sl=4&tt=34k&bcn=https%3A%2F%2Ffclog.baidu.com%2Flog%2Fweirwood%3Ftype%3Dperf&r=comu8z989&ul=racw"',
+#     False,
+#     10,
+#     None,
+# )
