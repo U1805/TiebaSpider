@@ -14,6 +14,6 @@ todo
 - [ ] 下载时禁用按钮/结束时设置按钮文本
 - [ ] 允许多次下载
 - [ ] 链接自动提取tid
-- [ ] title优化，保存文件名 tid-title
+- [x] title优化，保存文件名 tid-title
 
 credit: [PyStand](https://github.com/skywind3000/PyStand/releases)
