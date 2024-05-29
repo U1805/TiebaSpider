@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QSpinBox,
     QLabel,
+    QHBoxLayout,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import func
@@ -65,11 +66,15 @@ class FileSelector(QWidget):
         layout.addWidget(self.checkbox_localize)
 
         # 数字输入框 - 最大线程数
+        thread_layout = QHBoxLayout()
+        thread_label = QLabel("最大线程数:", self)
+        thread_layout.addWidget(thread_label)
         self.thread_input = QSpinBox(self)
         self.thread_input.setMinimum(1)
-        self.thread_input.setMaximum(100)  # 根据需求调整最大值
-        self.thread_input.setValue(10)  # 默认值为10
-        layout.addWidget(self.thread_input)
+        self.thread_input.setMaximum(100)
+        self.thread_input.setValue(10)
+        thread_layout.addWidget(self.thread_input)
+        layout.addLayout(thread_layout)
 
         # 开始按钮
         self.btn_start = QPushButton("🚀Start!", self)
@@ -79,6 +84,7 @@ class FileSelector(QWidget):
         # 进度条
         self.progress_bar = QProgressBar(self)
         self.progress_bar.setAlignment(Qt.AlignCenter)
+        self.progress_bar.setValue(0)
         layout.addWidget(self.progress_bar)
 
         self.setLayout(layout)
