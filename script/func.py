@@ -185,7 +185,7 @@ def fetchPage(tid, pn=1):
 def fetchReply(tid, total, progress_callback):
     global COMMENT_POOL
     pn = 1
-    while True:
+    while pn <= total:
         try:
             res = myrequests(
                 f"https://tieba.baidu.com/p/totalComment?tid={tid}&pn={pn}&see_lz=0"
