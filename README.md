@@ -43,3 +43,7 @@
 ## CREDIT
 
 [PyStand](https://github.com/skywind3000/PyStand): 🚀 Python Standalone Deploy Environment !! 
+
+## License
+
+[MIT license](./LICENSE)
