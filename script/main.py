@@ -95,7 +95,7 @@ class FileSelector(QWidget):
     def start_thread(self):
         if not self.my_thread or not self.my_thread.isRunning():
             self.my_thread = Worker(
-                self.url_input.text().split("?")[0].split("/")[-1],
+                self.url_input.text().split("?")[0].split("#")[0].split("/")[-1],
                 self.cookie_input.text(),
                 self.checkbox_localize.isChecked(),
                 self.thread_input.value(),
