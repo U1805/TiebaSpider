@@ -14,22 +14,22 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import func
 
+# from utils import HEADERS
+
 
 class Worker(QThread):
     updateProgressBar = pyqtSignal(int)
     updateButtonText = pyqtSignal(str)
 
-    def __init__(self, tid, cookie, local, max_connections):
+    def __init__(self, tid, local, max_connections):
         super().__init__()
         self.tid = tid
-        self.cookie = cookie
         self.local = local
         self.max_connections = max_connections
 
     def run(self):
         func.run(
             self.tid,
-            self.cookie,
             self.local,
             self.max_connections,
             self.updateProgressBar.emit,
@@ -93,13 +93,14 @@ class FileSelector(QWidget):
         self.my_thread = None
 
     def start_thread(self):
+        # global HEADERS
         if not self.my_thread or not self.my_thread.isRunning():
             self.my_thread = Worker(
                 self.url_input.text().split("?")[0].split("#")[0].split("/")[-1],
-                self.cookie_input.text(),
                 self.checkbox_localize.isChecked(),
                 self.thread_input.value(),
             )
+            # HEADERS["Cookies"] = self.cookie_input.text()
             self.my_thread.updateProgressBar.connect(self.updateProgressBar)
             self.my_thread.updateButtonText.connect(self.updateButtonText)
             self.my_thread.start()
