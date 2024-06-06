@@ -3,9 +3,11 @@ import threading
 from fetcher import fetchPage, fetchJsonReply
 from format import formatPage
 from template import TEMPLATE
+from utils import update_pool_instance, proxy_pool
 
 
 def run(tid, local, max_connections, progress_callback, button_callback):
+    update_pool_instance(proxy_pool(button_callback, progress_callback))
 
     page, html_title, page_num = fetchPage(tid)
     button_callback("Downloading replies...")

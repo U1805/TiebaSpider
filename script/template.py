@@ -6,3 +6,9 @@ TEMPLATE = {
     "reply_part1": """<li> <a class="j_user_card lzl_p_p"><img src="%avatar%"></a> <div class=lzl_cnt> <a class="at j_user_card vip_red">%username%</a>:&nbsp;<span class=lzl_content_main>%content%</span> <div class=lzl_content_reply><span class="lzl_op_list j_lzl_o_l"></span><span class=lzl_time>%time%</span></div> </div> </li> """,
     "reply_part2": """</ul> </div> </div> """,
 }
+
+AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15"
+]

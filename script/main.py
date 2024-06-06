@@ -56,10 +56,10 @@ class FileSelector(QWidget):
         self.url_input.setPlaceholderText("输入url")
         layout.addWidget(self.url_input)
 
-        # 文本输入框 - cookie
-        self.cookie_input = QLineEdit(self)
-        self.cookie_input.setPlaceholderText("输入cookie")
-        layout.addWidget(self.cookie_input)
+        # # 文本输入框 - cookie
+        # self.cookie_input = QLineEdit(self)
+        # self.cookie_input.setPlaceholderText("输入cookie")
+        # layout.addWidget(self.cookie_input)
 
         # Checkbox - 是否图片本地化
         self.checkbox_localize = QCheckBox("是否图片本地化", self)

@@ -14,15 +14,10 @@ def fetchPage(tid, pn=1):
 
     res = myrequests(BASE_URL + f"{tid}?pn={pn}")
     soup = BeautifulSoup(res.text, "html.parser")
-    print(soup)
 
     if pn == 1:
         page_title = soup.title.text
-        try:
-            page_num = int(soup.select(".l_reply_num .red")[1].text)
-        except:
-            # os.MessageBox("获取页面失败，可能是 Cookie 失效，需要安全验证", "错误")
-            raise (Exception("❌ 需要安全验证/Cookie 失效"))
+        page_num = int(soup.select(".l_reply_num .red")[1].text)
         print("title: " + page_title)
         print("page num: " + str(page_num))
 
