@@ -1,5 +1,4 @@
 from template import TEMPLATE
-from template import TEMPLATE
 from datetime import datetime
 
 import aiotieba

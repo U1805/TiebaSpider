@@ -4,7 +4,7 @@
 
 ## 使用说明
 
-<img src="preview-gui.png" alt="preview" align="right" style="margin-bottom: 20px; height:200px"/>
+<img src="image.png" alt="preview" align="right" style="margin-bottom: 20px; height:200px"/>
 
 **URL**：就是 URL，浏览器地址栏粘过来
 

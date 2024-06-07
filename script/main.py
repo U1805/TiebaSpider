@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QLineEdit,
     QCheckBox,
-    QLabel,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 import func
@@ -41,12 +40,9 @@ class FileSelector(QWidget):
 
     def initUI(self):
         self.setWindowTitle("标题随便放点字在这里先")
-        self.setGeometry(300, 300, 300, 200)  # 调整高度以容纳新增的组件
+        self.setGeometry(300, 300, 300, 180)  # 调整高度以容纳新增的组件
 
         layout = QVBoxLayout()
-
-        label = QLabel('<font color="red">不要开 VPN！</font>', self)
-        layout.addWidget(label)
 
         # 文本输入框 - url
         self.url_input = QLineEdit(self)
