@@ -1,7 +1,7 @@
 import sys, os
 
 os.chdir(os.path.dirname(__file__))
-sys.path.append(os.path.abspath('script'))
+#sys.path.append(os.path.abspath('script'))
 sys.path.append(os.path.abspath('script.egg'))
 
 # 中文路径问题 添加 platforms 到环境变量

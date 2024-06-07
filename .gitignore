@@ -1,5 +1,4 @@
 *.html
-!template.html
 *.ipynb
 __pycache__
-TiebaSpider.zip
+TiebaSpider.7z
